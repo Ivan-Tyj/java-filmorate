@@ -19,13 +19,13 @@ public class UserController {
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
-    private final static String MESSAGE_OF_VALID_EMAIL_EMPTY = "Электронная почта не может быть пустой";
-    private final static String MESSAGE_OF_VALID_EMAIL_SYMBOL = "Символ @ - не передан";
-    private final static String MESSAGE_OF_VALID_LOGIN_EMPTY = "Логин не может быть пустой";
-    private final static String MESSAGE_OF_VALID_LOGIN_BLANK = "Логин не может состоять из пробелов";
-    private final static String MESSAGE_OF_VALID_LOGIN_SPACE = "Логин не может содержать пробелов";
-    private final static String MESSAGE_OF_VALID_BIRTHDAY = "Дата рождения не может быть в будущем";
-    private final static String MESSAGE_OF_ID_USER = "Некорректный Id пользователя";
+    private static final String MESSAGE_OF_VALID_EMAIL_EMPTY = "Электронная почта не может быть пустой";
+    private static final String MESSAGE_OF_VALID_EMAIL_SYMBOL = "Символ @ - не передан";
+    private static final String MESSAGE_OF_VALID_LOGIN_EMPTY = "Логин не может быть пустой";
+    private static final String MESSAGE_OF_VALID_LOGIN_BLANK = "Логин не может состоять из пробелов";
+    private static final String MESSAGE_OF_VALID_LOGIN_SPACE = "Логин не может содержать пробелов";
+    private static final String MESSAGE_OF_VALID_BIRTHDAY = "Дата рождения не может быть в будущем";
+    private static final String MESSAGE_OF_ID_USER = "Некорректный Id пользователя";
 
     @GetMapping
     public Collection<User> findAll() {

@@ -19,14 +19,14 @@ public class FilmController {
 
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
-    private final static int MAX_LENGTH_DESCRIPTION = 200;
-    private final static LocalDate MIN_RELEASE_DATE = LocalDate.of(1985, 12, 28);
+    private static final int MAX_LENGTH_DESCRIPTION = 200;
+    private static final LocalDate MIN_RELEASE_DATE = LocalDate.of(1985, 12, 28);
 
-    private final static String MESSAGE_OF_VALID_NAME = "Название не может быть пустым";
-    private final static String MESSAGE_OF_VALID_DESCRIPTION = "Максимальная длина описания превышена";
-    private final static String MESSAGE_OF_VALID_RELEASE_DATE = "Дата релиза должна быть позже чем " + MIN_RELEASE_DATE;
-    private final static String MESSAGE_OF_VALID_DURATION = "Продолжительность фильма должна быть положительным числом";
-    private final static String MESSAGE_OF_ID_FILM = "Некорректный Id фильма";
+    private static final String MESSAGE_OF_VALID_NAME = "Название не может быть пустым";
+    private static final String MESSAGE_OF_VALID_DESCRIPTION = "Максимальная длина описания превышена";
+    private static final String MESSAGE_OF_VALID_RELEASE_DATE = "Дата релиза должна быть позже чем " + MIN_RELEASE_DATE;
+    private static final String MESSAGE_OF_VALID_DURATION = "Продолжительность фильма должна быть положительным числом";
+    private static final String MESSAGE_OF_ID_FILM = "Некорректный Id фильма";
 
     @GetMapping
     public Collection<Film> findAll() {
