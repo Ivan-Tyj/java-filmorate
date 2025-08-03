@@ -38,10 +38,6 @@ public class UserController {
         user.setId(getNextId());
         log.debug("Id пользователя - {}", user.getId());
         log.debug("Общее количество пользователей - {}", users.size());
-        if (user.getName().isBlank()) {
-            log.debug("Имя пользователя пустое, будет использован логин - {}", user.getLogin());
-            user.setName(user.getLogin());
-        }
         users.put(user.getId(), user);
         log.debug("Новый пользователь добавлен ,общее количество пользователей - {}", users.size());
         return user;
@@ -82,6 +78,11 @@ public class UserController {
         if (user.getBirthday().isAfter(LocalDate.now())) {
             log.error("Дата рождения находится в будущем - {}", user.getBirthday());
             throw new ValidationException(MESSAGE_OF_VALID_BIRTHDAY);
+        }
+
+        if (user.getName().isBlank()) {
+            log.debug("Имя пользователя пустое, будет использован логин - {}", user.getLogin());
+            user.setName(user.getLogin());
         }
     }
 
