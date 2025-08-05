@@ -80,7 +80,7 @@ public class UserController {
             throw new ValidationException(MESSAGE_OF_VALID_BIRTHDAY);
         }
 
-        if (user.getName().isBlank()) {
+        if (user.getName() == null || user.getName().isBlank()) {
             log.debug("Имя пользователя пустое, будет использован логин - {}", user.getLogin());
             user.setName(user.getLogin());
         }

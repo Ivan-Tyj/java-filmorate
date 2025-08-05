@@ -54,7 +54,7 @@ public class FilmController {
     }
 
     private void validateFilms(Film film) {
-        if (film.getName().isBlank()) {
+        if (film.getName() == null || film.getName().isBlank()) {
             log.error("Передано некорректное наименование фильма - {}", film.getName());
             throw new ValidationException(MESSAGE_OF_VALID_NAME);
         }
@@ -66,8 +66,8 @@ public class FilmController {
             log.error("Некорректная дата релиза - {}", film.getReleaseDate());
             throw new ValidationException(MESSAGE_OF_VALID_RELEASE_DATE);
         }
-        if (film.getDuration().toSeconds() <= 0) {
-            log.error("Некорректная продолжительность фильма, сек - {}", film.getDuration().toSeconds());
+        if (film.getDuration() <= 0) {
+            log.error("Некорректная продолжительность фильма, сек - {}", film.getDuration());
             throw new ValidationException(MESSAGE_OF_VALID_DURATION);
         }
     }
