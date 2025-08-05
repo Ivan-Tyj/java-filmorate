@@ -23,7 +23,6 @@ public class UserControllerTests {
         assertEquals(user, userController.create(user));
     }
 
-
     @Test
     void updateUser() {
         User user1 = new User("user@email", "userLogin", LocalDate.now());
