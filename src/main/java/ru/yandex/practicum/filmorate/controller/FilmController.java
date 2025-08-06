@@ -20,7 +20,7 @@ public class FilmController {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
     private static final int MAX_LENGTH_DESCRIPTION = 200;
-    private static final LocalDate MIN_RELEASE_DATE = LocalDate.of(1985, 12, 28);
+    private static final LocalDate MIN_RELEASE_DATE = LocalDate.of(1895, 12, 28);
 
     private static final String MESSAGE_OF_VALID_NAME = "Название не может быть пустым";
     private static final String MESSAGE_OF_VALID_DESCRIPTION = "Максимальная длина описания превышена";
