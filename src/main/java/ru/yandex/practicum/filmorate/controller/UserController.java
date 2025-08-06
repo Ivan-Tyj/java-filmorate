@@ -53,7 +53,7 @@ public class UserController {
     }
 
     private void validateUser(User user) {
-        if (user.getEmail().isBlank()) {
+        if (user.getEmail() == null || user.getEmail().isEmpty() || user.getEmail().isBlank()) {
             log.error("Передано пустое значение эл. почты - {}", user.getEmail());
             throw new ValidationException(MESSAGE_OF_VALID_EMAIL_EMPTY);
         }
@@ -62,7 +62,7 @@ public class UserController {
             throw new ValidationException(MESSAGE_OF_VALID_EMAIL_SYMBOL);
         }
 
-        if (user.getLogin().isEmpty()) {
+        if (user.getLogin() == null || user.getLogin().isEmpty()) {
             log.error("Логин пустой - {}", user.getLogin());
             throw new ValidationException(MESSAGE_OF_VALID_LOGIN_EMPTY);
         }
@@ -80,7 +80,7 @@ public class UserController {
             throw new ValidationException(MESSAGE_OF_VALID_BIRTHDAY);
         }
 
-        if (user.getName() == null || user.getName().isBlank()) {
+        if (user.getName() == null || user.getName().isEmpty() || user.getName().isBlank()) {
             log.debug("Имя пользователя пустое, будет использован логин - {}", user.getLogin());
             user.setName(user.getLogin());
         }
@@ -89,7 +89,7 @@ public class UserController {
     @PutMapping
     public User update(@RequestBody User user) {
         // проверяем необходимые условия
-        if (user.getId() < 0 || user.getId() > users.size()) {
+        if (user.getId() != users.size()) {
             log.error("Некорректный Id пользователя - {}", user.getId());
             throw new ValidationException(MESSAGE_OF_ID_USER);
         }

@@ -54,7 +54,7 @@ public class FilmController {
     }
 
     private void validateFilms(Film film) {
-        if (film.getName() == null || film.getName().isBlank()) {
+        if (film.getName() == null || film.getName().isEmpty() || film.getName().isBlank()) {
             log.error("Передано некорректное наименование фильма - {}", film.getName());
             throw new ValidationException(MESSAGE_OF_VALID_NAME);
         }
@@ -75,7 +75,7 @@ public class FilmController {
     @PutMapping
     public Film update(@RequestBody Film film) {
         // проверяем необходимые условия
-        if (film.getId() < 0 || film.getId() > films.size()) {
+        if (film.getId() < 0) {
             log.error("Некорректный Id фильма - {}", film.getId());
             throw new ValidationException(MESSAGE_OF_ID_FILM);
         }
