@@ -89,7 +89,7 @@ public class UserController {
     @PutMapping
     public User update(@RequestBody User user) {
         // проверяем необходимые условия
-        if (user.getId() < 0) {
+        if (user.getId() < 0 || user.getId() > users.size()) {
             log.error("Некорректный Id пользователя - {}", user.getId());
             throw new ValidationException(MESSAGE_OF_ID_USER);
         }
