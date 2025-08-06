@@ -91,7 +91,7 @@ public class UserController {
         // проверяем необходимые условия
         if (user.getId() < 0 || user.getId() > users.size()) {
             log.error("Некорректный Id пользователя - {}", user.getId());
-            throw new ValidationException(MESSAGE_OF_ID_USER);
+            throw new RuntimeException(MESSAGE_OF_ID_USER);
         }
         if (users.containsKey(user.getId())) {
             validateUser(user);

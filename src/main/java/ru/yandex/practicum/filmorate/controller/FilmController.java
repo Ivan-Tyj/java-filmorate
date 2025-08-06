@@ -75,9 +75,9 @@ public class FilmController {
     @PutMapping
     public Film update(@RequestBody Film film) {
         // проверяем необходимые условия
-        if (film.getId() < 0) {
+        if (film.getId() < 0 || film.getId() > films.size()) {
             log.error("Некорректный Id фильма - {}", film.getId());
-            throw new ValidationException(MESSAGE_OF_ID_FILM);
+            throw new RuntimeException(MESSAGE_OF_ID_FILM);
         }
         if (films.containsKey(film.getId())) {
             validateFilms(film);
