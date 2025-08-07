@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controllers;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.model.User;
@@ -12,11 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class UserControllerTests {
     static UserController userController = new UserController();
 
-    @BeforeAll
-    static void clear() {
-        userController.clearAllUsers();
-    }
-
     @Test
     void createdUser() {
         User user = new User("mail@", "login", LocalDate.now());
@@ -25,10 +19,8 @@ public class UserControllerTests {
 
     @Test
     void updateUser() {
-        User user1 = new User("user@email", "userLogin", LocalDate.now());
         User user2 = new User("user2@email", "userLogin", LocalDate.now());
         user2.setId(1);
-        userController.create(user1);
         assertEquals(user2, userController.update(user2));
     }
 

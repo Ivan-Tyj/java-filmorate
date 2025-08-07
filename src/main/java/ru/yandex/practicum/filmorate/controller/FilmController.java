@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,9 @@ public class FilmController {
 
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
+    @Getter
+    private int maxIdFilms = 0;
+
     private static final int MAX_LENGTH_DESCRIPTION = 200;
     private static final LocalDate MIN_RELEASE_DATE = LocalDate.of(1895, 12, 28);
 
@@ -36,21 +40,12 @@ public class FilmController {
     @PostMapping
     public Film create(@RequestBody Film film) {
         validateFilms(film);
-        film.setId(getNextId());
+        film.setId(++maxIdFilms);
         log.debug("Id фильма - {}", film.getId());
         log.debug("Общее количество фильмов - {}", films.size());
         films.put(film.getId(), film);
         log.debug("Новый фильм добавлен ,общее количество фильмов - {}", films.size());
         return film;
-    }
-
-    private int getNextId() {
-        int currentMaxId = films.keySet()
-                .stream()
-                .mapToInt(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
     }
 
     private void validateFilms(Film film) {
@@ -79,17 +74,12 @@ public class FilmController {
             log.error("Некорректный Id фильма - {}", film.getId());
             throw new RuntimeException(MESSAGE_OF_ID_FILM);
         }
-        if (films.containsKey(film.getId())) {
-            validateFilms(film);
-            films.put(film.getId(), film);
-            log.debug("Фильм обновлен");
-        } else {
+        if (!films.containsKey(film.getId())) {
             throw new ValidationException("Фильм с id = " + film.getId() + " не найден");
         }
+        validateFilms(film);
+        films.put(film.getId(), film);
+        log.debug("Фильм обновлен");
         return film;
-    }
-
-    public void clearAllFilms() {
-        films.clear();
     }
 }

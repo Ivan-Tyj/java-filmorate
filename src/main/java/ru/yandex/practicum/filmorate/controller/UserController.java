@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,9 @@ import java.util.Map;
 public class UserController {
 
     private final Map<Integer, User> users = new HashMap<>();
+
+    @Getter
+    private int maxIdUsers = 0;
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
@@ -35,21 +39,12 @@ public class UserController {
     @PostMapping
     public User create(@RequestBody User user) {
         validateUser(user);
-        user.setId(getNextId());
+        user.setId(++maxIdUsers);
         log.debug("Id пользователя - {}", user.getId());
         log.debug("Общее количество пользователей - {}", users.size());
         users.put(user.getId(), user);
         log.debug("Новый пользователь добавлен ,общее количество пользователей - {}", users.size());
         return user;
-    }
-
-    private int getNextId() {
-        int currentMaxId = users.keySet()
-                .stream()
-                .mapToInt(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
     }
 
     private void validateUser(User user) {
@@ -93,17 +88,12 @@ public class UserController {
             log.error("Некорректный Id пользователя - {}", user.getId());
             throw new RuntimeException(MESSAGE_OF_ID_USER);
         }
-        if (users.containsKey(user.getId())) {
-            validateUser(user);
-            users.put(user.getId(), user);
-            log.debug("Фильм обновлен");
-        } else {
+        if (!users.containsKey(user.getId())) {
             throw new ValidationException("Пользователь с id = " + user.getId() + " не найден");
         }
+        validateUser(user);
+        users.put(user.getId(), user);
+        log.debug("Фильм обновлен");
         return user;
-    }
-
-    public void clearAllUsers() {
-        users.clear();
     }
 }
