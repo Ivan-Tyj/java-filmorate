@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.util.Collection;
 import java.util.Set;
@@ -17,26 +16,25 @@ import java.util.Set;
 public class UserController {
 
     private final UserService userService;
-    private final InMemoryUserStorage inMemoryUserStorage;
 
     @GetMapping
     public Collection<User> findAll() {
-        return inMemoryUserStorage.findAll();
+        return userService.findAll();
     }
 
     @GetMapping("/users/{id}")
     public User findById(@PathVariable("id") int id) {
-        return inMemoryUserStorage.findById(id);
+        return userService.findById(id);
     }
 
     @PostMapping
     public User create(@RequestBody User user) {
-        return inMemoryUserStorage.create(user);
+        return userService.create(user);
     }
 
     @PutMapping
     public User update(@RequestBody User user) {
-        return inMemoryUserStorage.update(user);
+        return userService.update(user);
     }
 
     @PutMapping("/users/{id}/friends/{friendId}")
@@ -63,7 +61,7 @@ public class UserController {
     }
 
     @DeleteMapping
-    public void delete(@RequestBody User user) {
-        inMemoryUserStorage.delete(user);
+    public void deleteAll() {
+        userService.deleteAll();
     }
 }

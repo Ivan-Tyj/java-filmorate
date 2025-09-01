@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,8 +13,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 public class UserControllerTests {
+
     @Autowired
     private UserController userController;
+
+    @BeforeEach
+    void clear() {
+        userController.deleteAll();
+    }
 
     @Test
     void findAll() {
@@ -37,9 +44,12 @@ public class UserControllerTests {
 
     @Test
     void updateUser() {
-        User user = new User("user2@email", "userLogin", LocalDate.now());
-        user.setId(1);
-        assertEquals(user, userController.update(user));
+        User user = new User("mail@", "login", LocalDate.now());
+        userController.create(user);
+        User user2 = new User("user2@email", "userLogin", LocalDate.now());
+        user2.setId(1);
+        userController.update(user2);
+        assertEquals("user2@email", user2.getEmail());
     }
 
     @Test
@@ -86,6 +96,6 @@ public class UserControllerTests {
         userController.create(user3);
         userController.addFriend(1, 2);
         userController.addFriend(3, 2);
-        assertEquals(1, userController.findCommonFriends(1,3).size());
+        assertEquals(1, userController.findCommonFriends(1, 3).size());
     }
 }

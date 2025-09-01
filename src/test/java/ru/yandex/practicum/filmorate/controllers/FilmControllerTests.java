@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,42 +22,53 @@ public class FilmControllerTests {
     @Autowired
     private UserController userController;
 
+    @BeforeEach
+    void clear() {
+        filmController.deleteAll();
+        userController.deleteAll();
+    }
+
     @Test
     void findAllFilms() {
-        Film film1 = new Film("Film1", "description", LocalDate.of(1985, 12, 28),
-                1);
+        Film film1 = new Film("Film1", "description",
+                LocalDate.of(1985, 12, 28), 1);
         filmController.create(film1);
         assertEquals(1, filmController.findAll().size());
     }
 
     @Test
     void findById() {
-        Film film1 = new Film("Film1", "description", LocalDate.of(1985, 12, 28),
-                1);
+        Film film1 = new Film("Film1", "description",
+                LocalDate.of(1985, 12, 28), 1);
         filmController.create(film1);
         assertEquals(film1, filmController.findById(1));
     }
 
     @Test
     void createdFilm() {
-        Film film = new Film("Film", "description", LocalDate.of(1985, 12, 28),
-                1);
+        Film film = new Film("Film", "description",
+                LocalDate.of(1985, 12, 28), 1);
         assertEquals(film, filmController.create(film));
     }
 
     @Test
     void updateFilm() {
-        Film film2 = new Film("Film2", "description", LocalDate.of(1985, 12, 28),
-                1);
+        Film film = new Film("Film", "description",
+                LocalDate.of(1985, 12, 28), 1);
+        filmController.create(film);
+        Film film2 = new Film("Film2", "description",
+                LocalDate.of(1985, 12, 28), 1);
         film2.setId(1);
-        assertEquals(film2, filmController.update(film2));
+        filmController.update(film2);
+        assertEquals(film2.getName(), filmController.findById(1).getName());
     }
 
     @Test
     void addLike() {
-        Film film = new Film("Film", "description", LocalDate.of(1985, 12, 28),
-                1);
-        User user = new User("user@mail", "user", LocalDate.of(2000, 1, 1));
+        Film film = new Film("Film", "description",
+                LocalDate.of(1985, 12, 28), 1);
+        User user = new User("user@mail", "user",
+                LocalDate.of(2000, 1, 1));
         filmController.create(film);
         userController.create(user);
         filmController.addLike(1, 1);
@@ -65,9 +77,10 @@ public class FilmControllerTests {
 
     @Test
     void deleteLike() {
-        Film film = new Film("Film", "description", LocalDate.of(1985, 12, 28),
-                1);
-        User user = new User("user@mail", "user", LocalDate.of(2000, 1, 1));
+        Film film = new Film("Film", "description",
+                LocalDate.of(1985, 12, 28), 1);
+        User user = new User("user@mail", "user",
+                LocalDate.of(2000, 1, 1));
         filmController.create(film);
         userController.create(user);
         filmController.addLike(1, 1);
@@ -77,10 +90,10 @@ public class FilmControllerTests {
 
     @Test
     void findPopularFilms() {
-        Film film1 = new Film("Film1", "description", LocalDate.of(1985, 12, 28),
-                1);
-        Film film2 = new Film("Film2", "description", LocalDate.of(1985, 12, 28),
-                1);
+        Film film1 = new Film("Film1", "description",
+                LocalDate.of(1985, 12, 28), 1);
+        Film film2 = new Film("Film2", "description",
+                LocalDate.of(1985, 12, 28), 1);
         filmController.create(film1);
         filmController.create(film2);
         assertEquals(1, filmController.findPopularFilms(1).size());

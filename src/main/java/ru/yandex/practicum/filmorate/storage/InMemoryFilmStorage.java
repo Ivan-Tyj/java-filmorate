@@ -5,10 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.controller.FilmController;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,29 +22,22 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Getter
     private int maxIdFilms = 0;
 
-    private static final int MAX_LENGTH_DESCRIPTION = 200;
-    private static final LocalDate MIN_RELEASE_DATE = LocalDate.of(1895, 12, 28);
 
-    private static final String MESSAGE_OF_VALID_NAME = "Название не может быть пустым";
-    private static final String MESSAGE_OF_VALID_DESCRIPTION = "Максимальная длина описания превышена";
-    private static final String MESSAGE_OF_VALID_RELEASE_DATE = "Дата релиза должна быть позже чем " + MIN_RELEASE_DATE;
-    private static final String MESSAGE_OF_VALID_DURATION = "Продолжительность фильма должна быть положительным числом";
-    private static final String MESSAGE_OF_ID_FILM = "Некорректный Id фильма";
+    public long getFilmsSize() {
+        return films.size();
+    }
 
     public Collection<Film> findAll() {
         return films.values();
     }
 
     public Film findById(long id) {
-        if (id <= 0 || id > getMaxIdFilms()) {
-            throw new ValidationException(MESSAGE_OF_ID_FILM);
-        }
         Optional<Film> film = Optional.ofNullable(films.get(id));
         return film.orElseThrow();
     }
 
+
     public Film create(Film film) {
-        validateFilms(film);
         film.setId(++maxIdFilms);
         log.debug("Id фильма - {}", film.getId());
         log.debug("Общее количество фильмов - {}", films.size());
@@ -56,44 +47,15 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     public Film update(Film film) {
-        // проверяем необходимые условия
-        if (film.getId() < 0 || film.getId() > films.size()) {
-            log.error("Некорректный Id фильма - {}", film.getId());
-            throw new RuntimeException(MESSAGE_OF_ID_FILM);
-        }
-        if (!films.containsKey(film.getId())) {
-            throw new ValidationException("Фильм с id = " + film.getId() + " не найден");
-        }
-        validateFilms(film);
         films.put(film.getId(), film);
         log.debug("Фильм обновлен");
         return film;
     }
 
-    public void delete(Film film) {
-        validateFilms(film);
-        if (!films.containsKey(film.getId())) {
-            throw new ValidationException(MESSAGE_OF_ID_FILM);
-        }
-        films.remove(film.getId());
-    }
-
-    private void validateFilms(Film film) {
-        if (film.getName() == null || film.getName().isEmpty() || film.getName().isBlank()) {
-            log.error("Передано некорректное наименование фильма - {}", film.getName());
-            throw new ValidationException(MESSAGE_OF_VALID_NAME);
-        }
-        if (film.getDescription().length() > MAX_LENGTH_DESCRIPTION) {
-            log.error("Превышена максимальная длина описания: {}", film.getDescription().length());
-            throw new ValidationException(MESSAGE_OF_VALID_DESCRIPTION);
-        }
-        if (film.getReleaseDate().isBefore(MIN_RELEASE_DATE)) {
-            log.error("Некорректная дата релиза - {}", film.getReleaseDate());
-            throw new ValidationException(MESSAGE_OF_VALID_RELEASE_DATE);
-        }
-        if (film.getDuration() <= 0) {
-            log.error("Некорректная продолжительность фильма, сек - {}", film.getDuration());
-            throw new ValidationException(MESSAGE_OF_VALID_DURATION);
-        }
+    public void deleteAll() {
+        log.debug("Общее количество фильмов - {}", films.size());
+        films.clear();
+        maxIdFilms = 0;
+        log.debug("Список фильмов пуст");
     }
 }
