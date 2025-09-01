@@ -17,4 +17,5 @@ public interface FilmStorage {
     long getFilmsSize();
 
     void deleteAll();
+
 }

@@ -17,6 +17,7 @@ public class UserControllerTests {
     @Autowired
     private UserController userController;
 
+
     @BeforeEach
     void clear() {
         userController.deleteAll();

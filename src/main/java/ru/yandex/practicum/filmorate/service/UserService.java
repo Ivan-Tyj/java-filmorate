@@ -32,6 +32,7 @@ public class UserService {
     private static final String MESSAGE_OF_VALID_BIRTHDAY = "Дата рождения не может быть в будущем";
     private static final String MESSAGE_OF_ID_USER = "Некорректный Id пользователя";
 
+
     public Collection<User> findAll() {
         return userStorage.findAll();
     }

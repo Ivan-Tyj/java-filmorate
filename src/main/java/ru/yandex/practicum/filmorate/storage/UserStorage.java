@@ -17,5 +17,4 @@ public interface UserStorage {
     User findById(long id);
 
     void deleteAll();
-
 }

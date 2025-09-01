@@ -22,6 +22,7 @@ public class FilmControllerTests {
     @Autowired
     private UserController userController;
 
+
     @BeforeEach
     void clear() {
         filmController.deleteAll();
