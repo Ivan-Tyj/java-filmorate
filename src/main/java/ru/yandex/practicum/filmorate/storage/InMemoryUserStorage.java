@@ -17,7 +17,7 @@ public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
 
     @Getter
-    private int maxIdUsers = 0;
+    private long maxIdUsers = 0;
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
@@ -61,5 +61,10 @@ public class InMemoryUserStorage implements UserStorage {
             maxIdUsers = 0;
             log.debug("Список пользователей пуст - {}", 0);
         }
+    }
+
+    @Override
+    public boolean containUser(Long id) {
+        return users.containsKey(id);
     }
 }

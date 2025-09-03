@@ -8,22 +8,22 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ErrorHandler {
 
-    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler
     public ErrorResponse handleValidationException(final ValidationException e) {
-        return new ErrorResponse("error:" + e.getMessage());
+        return new ErrorResponse("Ошибка валидации: " + e.getMessage());
     }
 
-    @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler
     public ErrorResponse handleNotFoundException(final NotFoundException e) {
-        return new ErrorResponse("error:" + e.getMessage());
+        return new ErrorResponse("Объект не найден: " + e.getMessage());
     }
 
-    @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleThrowableException(final Throwable e) {
-        return new ErrorResponse("error:" + e.getMessage());
+    @ExceptionHandler(Exception.class)
+    public ErrorResponse handleInternalServerError(final Exception e) {
+        return new ErrorResponse("Ошибка сервера:" + e.getMessage());
     }
 
     class ErrorResponse {

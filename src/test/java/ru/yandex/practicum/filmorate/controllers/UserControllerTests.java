@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 public class UserControllerTests {
@@ -48,7 +49,7 @@ public class UserControllerTests {
         User user = new User("mail@", "login", LocalDate.now());
         userController.create(user);
         User user2 = new User("user2@email", "userLogin", LocalDate.now());
-        user2.setId(1);
+        user2.setId(1L);
         userController.update(user2);
         assertEquals("user2@email", user2.getEmail());
     }
@@ -59,7 +60,7 @@ public class UserControllerTests {
         User user2 = new User("user2@email", "userLogin", LocalDate.of(2000, 1, 1));
         userController.create(user);
         userController.create(user2);
-        userController.addFriend(1, 2);
+        userController.addFriend(1L, 2L);
         assertEquals(1, user.getFriends().size());
         assertEquals(1, user2.getFriends().size());
     }
@@ -70,10 +71,10 @@ public class UserControllerTests {
         User user2 = new User("user2@email", "userLogin", LocalDate.of(2000, 1, 1));
         userController.create(user);
         userController.create(user2);
-        userController.addFriend(1, 2);
+        userController.addFriend(1L, 2L);
         userController.deleteFriend(1, 2);
         assertEquals(0, user.getFriends().size());
-        assertEquals(1, user2.getFriends().size());
+        assertEquals(0, user2.getFriends().size());
     }
 
     @Test
@@ -82,9 +83,9 @@ public class UserControllerTests {
         User user2 = new User("user2@email", "userLogin", LocalDate.of(2000, 1, 1));
         userController.create(user);
         userController.create(user2);
-        userController.addFriend(1, 2);
-        assertEquals(1, userController.findAllFriends(1).size());
-        assertEquals(1, userController.findAllFriends(2).size());
+        userController.addFriend(1L, 2L);
+        assertEquals(1, userController.findAllFriends(1L).size());
+        assertEquals(1, userController.findAllFriends(2L).size());
     }
 
     @Test
@@ -95,8 +96,8 @@ public class UserControllerTests {
         userController.create(user);
         userController.create(user2);
         userController.create(user3);
-        userController.addFriend(1, 2);
-        userController.addFriend(3, 2);
-        assertEquals(1, userController.findCommonFriends(1, 3).size());
+        userController.addFriend(1L, 2L);
+        userController.addFriend(3L, 2L);
+        assertEquals(1, userController.findCommonFriends(1L, 3L).size());
     }
 }

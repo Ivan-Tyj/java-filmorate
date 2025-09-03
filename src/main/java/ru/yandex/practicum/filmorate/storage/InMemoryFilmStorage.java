@@ -58,4 +58,9 @@ public class InMemoryFilmStorage implements FilmStorage {
         maxIdFilms = 0;
         log.debug("Список фильмов пуст");
     }
+
+    @Override
+    public boolean containFilm(long id) {
+        return films.containsKey(id);
+    }
 }

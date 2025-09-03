@@ -18,4 +18,5 @@ public interface FilmStorage {
 
     void deleteAll();
 
+    boolean containFilm(long id);
 }

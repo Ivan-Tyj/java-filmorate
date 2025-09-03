@@ -19,4 +19,12 @@ public final class Film {
     public int getLikesSize() {
         return likes.size();
     }
+
+    public void addLike(Long id) {
+        likes.add(id);
+    }
+
+    public void deleteLike(Long id) {
+        likes.remove(id);
+    }
 }

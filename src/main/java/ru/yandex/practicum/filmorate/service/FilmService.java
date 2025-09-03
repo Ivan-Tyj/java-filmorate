@@ -5,9 +5,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.controller.UserController;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -21,6 +23,7 @@ public class FilmService {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
 
     private static final int MAX_LENGTH_DESCRIPTION = 200;
     private static final LocalDate MIN_RELEASE_DATE = LocalDate.of(1895, 12, 28);
@@ -30,6 +33,9 @@ public class FilmService {
     private static final String MESSAGE_OF_VALID_RELEASE_DATE = "Дата релиза должна быть позже чем " + MIN_RELEASE_DATE;
     private static final String MESSAGE_OF_VALID_DURATION = "Продолжительность фильма должна быть положительным числом";
     private static final String MESSAGE_OF_ID_FILM = "Некорректный Id фильма";
+    private static final String MESSAGE_OF_NOT_FOUND_FILM = "Фильм не найден";
+    private static final String MESSAGE_OF_NOT_FOUND_USER = "Пользователь не найден";
+    private static final String MESSAGE_OF_NOT_FOUND_LIKE = "Лайк не найден";
 
 
     public Collection<Film> findAll() {
@@ -37,7 +43,7 @@ public class FilmService {
     }
 
     public Film findById(long id) {
-        if (id <= 0 || id > filmStorage.getFilmsSize()) {
+        if (id <= 0) {
             throw new ValidationException(MESSAGE_OF_ID_FILM);
         }
         return filmStorage.findById(id);
@@ -49,12 +55,12 @@ public class FilmService {
     }
 
     public Film update(Film film) {
-        if (film.getId() < 0 || film.getId() > filmStorage.getFilmsSize()) {
+        if (film.getId() < 0) {
             log.error("Некорректный Id фильма - {}", film.getId());
-            throw new RuntimeException(MESSAGE_OF_ID_FILM);
+            throw new ValidationException(MESSAGE_OF_ID_FILM);
         }
-        if (findById(film.getId()) == null) {
-            throw new ValidationException("Фильм с id = " + film.getId() + " не найден");
+        if (!filmStorage.containFilm(film.getId())) {
+            throw new NotFoundException("Фильм с id = " + film.getId() + " не найден");
         }
         validateFilms(film);
         return filmStorage.update(film);
@@ -65,21 +71,19 @@ public class FilmService {
     }
 
     public void addLike(long filmId, long userId) {
-        Set<Long> likes = filmStorage.findById(filmId).getLikes();
-        log.debug("Список лайков получен, размер - {}", likes.size());
-        likes.add(userId);
-        log.debug("Лайк поставлен, количество лайков = {}", likes.size());
-        filmStorage.findById(filmId).setLikes(likes);
-        log.debug("Список лайков фильма обновлен, количество лайков = {}", likes.size());
+        validateLikes(filmId, userId);
+        filmStorage.findById(filmId).addLike(userId);
+        log.debug("Лайк поставлен, количество лайков = {}",
+                filmStorage.findById(filmId).getLikes());
     }
 
     public void deleteLike(long filmId, long userId) {
-        Set<Long> likes = filmStorage.findById(filmId).getLikes();
-        log.debug("Список лайков получен, размер - {}", likes.size());
-        likes.remove(userId);
-        log.debug("Лайк удален, количество лайков = {}", likes.size());
-        filmStorage.findById(filmId).setLikes(likes);
-        log.debug("Список лайков фильма обновлен, количество лайков = {}", likes.size());
+        validateLikes(filmId, userId);
+        if (!filmStorage.findById(filmId).getLikes().contains(userId)) {
+            throw new ValidationException(MESSAGE_OF_NOT_FOUND_LIKE);
+        }
+        filmStorage.findById(filmId).deleteLike(userId);
+        log.debug("Лайк удален, количество лайков = {}", filmStorage.findById(filmId).getLikes());
     }
 
     public Collection<Film> findPopularFilms(int count) {
@@ -107,6 +111,15 @@ public class FilmService {
         if (film.getDuration() <= 0) {
             log.error("Некорректная продолжительность фильма, сек - {}", film.getDuration());
             throw new ValidationException(MESSAGE_OF_VALID_DURATION);
+        }
+    }
+
+    private void validateLikes(Long filmId, Long userId) {
+        if (!filmStorage.containFilm(filmId)) {
+            throw new NotFoundException(MESSAGE_OF_NOT_FOUND_FILM);
+        }
+        if (!userStorage.containUser(userId)) {
+            throw new NotFoundException(MESSAGE_OF_NOT_FOUND_USER);
         }
     }
 }
