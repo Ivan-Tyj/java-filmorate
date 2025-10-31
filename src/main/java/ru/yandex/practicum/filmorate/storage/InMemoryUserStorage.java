@@ -21,12 +21,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
-
-    @Override
-    public Integer getUsersSize() {
-        return users.size();
-    }
-
     @Override
     public Collection<User> findAll() {
         return users.values();
