@@ -3,14 +3,14 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dal.UserStorage;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.validator.FriendValidator;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collection;
 
 @Slf4j
 @Service
@@ -21,8 +21,6 @@ public class UserService {
 
     private static final String MESSAGE_OF_ID_USER = "Некорректный Id пользователя";
     private static final String MESSAGE_OF_NULL_ID_USER = "Id пользователя не указан";
-    private static final String MESSAGE_OF_NOT_FOUND_USER = "Пользователь не найден";
-    private static final String MESSAGE_OF_INVALID_BY_MYSELF = "Id пользователя и друга совпадают";
 
 
     public Collection<User> findAll() {
@@ -64,14 +62,7 @@ public class UserService {
         return userStorage.update(user);
     }
 
-    public void deleteAll() {
-        log.info("Удаление всех пользователей");
-        if (!findAll().isEmpty()) {
-            userStorage.deleteAll();
-        }
-    }
-
-    public List<User> getFriendList(Long userId) {
+    public Collection<User> getFriendList(Long userId) {
         log.info("Запрос на получение списка друзей, пользователя с Id = {}", userId);
         findById(userId);
         return userStorage.getFriendList(userId);
@@ -79,62 +70,29 @@ public class UserService {
 
 
     public void addFriend(long userId, long friendId) {
-        log.info("Запрос на дружбу между {} и {}", userId, friendId);
-        validateFriend(userId, idFriend);
-
-        userStorage.findById(userId).addFriend(idFriend);
-        log.debug("Друг добавлен в список пользователя, размер списка - {}",
-                userStorage.findById(userId).getFriends());
-
-        userStorage.findById(idFriend).addFriend(userId);
-        log.debug("Пользователь добавлен в список друга, размер списка - {}",
-                userStorage.findById(idFriend).getFriends());
+        log.info("Пользователь с ID = {} пытается добавить в друзья пользователя с ID = {}",
+                userId, friendId);
+        FriendValidator.validateFriend(userId, friendId, userStorage);
+        log.info("Проверка прошла успешно, размер списка друзей пользователя - {}",
+                userStorage.getFriendList(userId));
+        userStorage.addFriend(userId, friendId);
+        log.info("Друг добавлен в список пользователя, размер списка - {}",
+                userStorage.getFriendList(userId));
     }
 
-    public void deleteFriend(long userId, long idFriend) {
-        validateFriend(userId, idFriend);
-        userStorage.findById(userId).deleteFriend(idFriend);
-        userStorage.findById(idFriend).deleteFriend(userId);
+    public void deleteFriend(long userId, long friendId) {
+        log.info("Пользователь с ID = {} пытается удалить из друзей пользователя с ID = {}",
+                userId, friendId);
+        FriendValidator.validateFriend(userId, friendId, userStorage);
+        log.info("Проверка прошла успешно");
+        userStorage.deleteFriend(userId, friendId);
+        log.info("Друг удален из списка друзей пользователя, размер списка - {}",
+                userStorage.getFriendList(userId));
     }
 
-    public Collection<User> findAllFriends(Long userId) {
-        if (!userStorage.containUser(userId)) {
-            throw new NotFoundException("Пользователь с id = " + userId + " не найден");
-        }
-        Collection<Long> userFriends = userStorage.findById(userId).getFriends();
-        log.debug("Список друзей получен, размер - {}", userFriends.size());
-        return userFriends.stream()
-                .map(userStorage::findById)
-                .collect(Collectors.toList());
-    }
-
-    public Collection<User> findCommonFriends(long userId, long anotherUserId) {
-        validateFriend(userId, anotherUserId);
-        Set<Long> userFriends = userStorage.findById(userId).getFriends();
-        Set<Long> anotherUserFriends = userStorage.findById(anotherUserId).getFriends();
-        Collection<User> commons = new ArrayList<>();
-
-        for (Long userFriend : userFriends) {
-            for (Long anotherUserFriend : anotherUserFriends) {
-                if (Objects.equals(userFriend, anotherUserFriend)) {
-                    commons.add(userStorage.findById(userFriend));
-                    log.debug("Общий друг найден и добавлен в список, размер списка - {}", commons.size());
-                }
-            }
-        }
-        return commons;
-    }
-
-
-    private void validateFriend(Long userId, Long idFriend) {
-        if (!userStorage.containUser(userId)) {
-            throw new NotFoundException(MESSAGE_OF_NOT_FOUND_USER);
-        }
-        if (!userStorage.containUser(idFriend)) {
-            throw new NotFoundException(MESSAGE_OF_NOT_FOUND_USER);
-        }
-        if (userId.equals(idFriend)) {
-            throw new ValidationException(MESSAGE_OF_INVALID_BY_MYSELF);
-        }
+    public Collection<User> findCommonFriends(Long userId, Long anotherUserId) {
+        log.info("Поиск общих друзей пользователей с ID 1 = {} и ID 2 = {}", userId, anotherUserId);
+        FriendValidator.validateFriend(userId, anotherUserId, userStorage);
+        return userStorage.findCommonFriends(userId, anotherUserId);
     }
 }

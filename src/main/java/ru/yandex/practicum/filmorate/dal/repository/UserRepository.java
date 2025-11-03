@@ -4,11 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.dal.UserStorage;
 import ru.yandex.practicum.filmorate.dal.mapper.UserRowMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
 import java.util.List;
@@ -38,6 +38,21 @@ public class UserRepository extends BaseRepository<User> implements UserStorage 
             "DELETE FROM friends WHERE user_id = ? AND friend_id = ?";
     private static final String DELETE_USER_QUERY = "DELETE FROM users WHERE id = ?";
     private static final String CONTAIN_USER_QUERY = "SELECT COUNT(*) FROM users WHERE id = ?";
+    private static final String GET_COMMON_FRIENDS_QUERY = """
+            WITH user_friends AS (
+                SELECT friend_id as user_id FROM friends WHERE user_id = ?
+                UNION
+                SELECT user_id as user_id FROM friends WHERE friend_id = ?
+            ),
+                another_friends AS (
+                SELECT friend_id as user_id FROM friends WHERE user_id = ?
+                UNION
+                SELECT user_id as user_id FROM friends WHERE friend_id = ?
+            )
+            SELECT u.*
+            FROM users AS u
+            JOIN user_friends AS uf ON u.id = uf.user_id
+            JOIN another_friends AS af ON u.id = af.user_id""";
 
     public UserRepository(JdbcTemplate jdbc, UserRowMapper userRowMapper) {
         super(jdbc, userRowMapper);
@@ -131,5 +146,10 @@ public class UserRepository extends BaseRepository<User> implements UserStorage 
     public boolean containUser(Long userId) {
         Integer count = jdbc.queryForObject(CONTAIN_USER_QUERY, Integer.class, userId);
         return count > 0;
+    }
+
+    @Override
+    public List<User> findCommonFriends(Long userId, Long anotherUserId) {
+        return findMany(GET_COMMON_FRIENDS_QUERY, userId, userId, anotherUserId, anotherUserId);
     }
 }

@@ -9,7 +9,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.dal.UserStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -24,16 +24,7 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
-    private static final int MAX_LENGTH_DESCRIPTION = 200;
-    private static final LocalDate MIN_RELEASE_DATE = LocalDate.of(1895, 12, 28);
-
-    private static final String MESSAGE_OF_VALID_NAME = "Название не может быть пустым";
-    private static final String MESSAGE_OF_VALID_DESCRIPTION = "Максимальная длина описания превышена";
-    private static final String MESSAGE_OF_VALID_RELEASE_DATE = "Дата релиза должна быть позже чем " + MIN_RELEASE_DATE;
-    private static final String MESSAGE_OF_VALID_DURATION = "Продолжительность фильма должна быть положительным числом";
     private static final String MESSAGE_OF_ID_FILM = "Некорректный Id фильма";
-    private static final String MESSAGE_OF_NOT_FOUND_FILM = "Фильм не найден";
-    private static final String MESSAGE_OF_NOT_FOUND_USER = "Пользователь не найден";
     private static final String MESSAGE_OF_NOT_FOUND_LIKE = "Лайк не найден";
 
 
@@ -94,31 +85,5 @@ public class FilmService {
                 .collect(Collectors.toList());
     }
 
-    private void validateFilms(Film film) {
-        if (film.getName() == null || film.getName().isEmpty() || film.getName().isBlank()) {
-            log.error("Передано некорректное наименование фильма - {}", film.getName());
-            throw new ValidationException(MESSAGE_OF_VALID_NAME);
-        }
-        if (film.getDescription().length() > MAX_LENGTH_DESCRIPTION) {
-            log.error("Превышена максимальная длина описания: {}", film.getDescription().length());
-            throw new ValidationException(MESSAGE_OF_VALID_DESCRIPTION);
-        }
-        if (film.getReleaseDate().isBefore(MIN_RELEASE_DATE)) {
-            log.error("Некорректная дата релиза - {}", film.getReleaseDate());
-            throw new ValidationException(MESSAGE_OF_VALID_RELEASE_DATE);
-        }
-        if (film.getDuration() <= 0) {
-            log.error("Некорректная продолжительность фильма, сек - {}", film.getDuration());
-            throw new ValidationException(MESSAGE_OF_VALID_DURATION);
-        }
-    }
 
-    private void validateLikes(Long filmId, Long userId) {
-        if (!filmStorage.containFilm(filmId)) {
-            throw new NotFoundException(MESSAGE_OF_NOT_FOUND_FILM);
-        }
-        if (!userStorage.containUser(userId)) {
-            throw new NotFoundException(MESSAGE_OF_NOT_FOUND_USER);
-        }
-    }
 }

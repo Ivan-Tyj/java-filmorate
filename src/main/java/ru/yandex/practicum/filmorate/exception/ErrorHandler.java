@@ -28,12 +28,6 @@ public class ErrorHandler {
         return new ErrorResponse("Ошибка сервера:" + e.getMessage());
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler
-    public ErrorResponse handleValidationFriendship(final ValidationException e) {
-        return new ErrorResponse("Ошибка валидации дружбы: " + e.getMessage());
-    }
-
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ExceptionHandler
     public ErrorResponse handleNullContent(final NullContentException e) {
