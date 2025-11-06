@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -12,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-@Component
+
 public class InMemoryFilmStorage implements FilmStorage {
 
     private final Map<Long, Film> films = new HashMap<>();
@@ -27,6 +26,12 @@ public class InMemoryFilmStorage implements FilmStorage {
         return films.size();
     }
 
+    @Override
+    public void deleteFilmById(long id) {
+        throw new RuntimeException("Not Implements");
+    }
+
+    @Override
     public Collection<Film> findAll() {
         return films.values();
     }
@@ -36,9 +41,9 @@ public class InMemoryFilmStorage implements FilmStorage {
         return film.orElseThrow();
     }
 
-
+    @Override
     public Film create(Film film) {
-        film.setId(++maxIdFilms);
+        film.setId((long) ++maxIdFilms);
         log.debug("Id фильма - {}", film.getId());
         log.debug("Общее количество фильмов - {}", films.size());
         films.put(film.getId(), film);
@@ -46,12 +51,14 @@ public class InMemoryFilmStorage implements FilmStorage {
         return film;
     }
 
+    @Override
     public Film update(Film film) {
         films.put(film.getId(), film);
         log.debug("Фильм обновлен");
         return film;
     }
 
+    @Override
     public void deleteAll() {
         log.debug("Общее количество фильмов - {}", films.size());
         films.clear();
@@ -62,5 +69,25 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public boolean containFilm(long id) {
         return films.containsKey(id);
+    }
+
+    @Override
+    public void addLike(Long filmId, Long userId) {
+        throw new RuntimeException("Not Implements");
+    }
+
+    @Override
+    public void deleteLike(Long filmId, Long userId) {
+        throw new RuntimeException("Not Implements");
+    }
+
+    @Override
+    public Collection<Film> getPopularFilms(int count) {
+        throw new RuntimeException("Not Implements");
+    }
+
+    @Override
+    public boolean containLike(long filmId, long userId) {
+        throw new RuntimeException("Not Implements");
     }
 }

@@ -4,11 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.dal.UserStorage;
 import ru.yandex.practicum.filmorate.dal.mapper.UserRowMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
 import java.util.List;
@@ -53,6 +53,7 @@ public class UserRepository extends BaseRepository<User> implements UserStorage 
             FROM users AS u
             JOIN user_friends AS uf ON u.id = uf.user_id
             JOIN another_friends AS af ON u.id = af.user_id""";
+    private static final String DELETE_ALL_USERS_QUERY = "DELETE FROM users";
 
     public UserRepository(JdbcTemplate jdbc, UserRowMapper userRowMapper) {
         super(jdbc, userRowMapper);
@@ -120,8 +121,8 @@ public class UserRepository extends BaseRepository<User> implements UserStorage 
     }
 
     private Integer checkFriendship(Long userId, Long friendId) {
-        Integer countUser = jdbc.queryForObject(FRIENDSHIP_CHECK_QUERY, Integer.class, userId, friendId);
-        Integer countFriend = jdbc.queryForObject(FRIENDSHIP_CHECK_QUERY, Integer.class, friendId, userId);
+        int countUser = jdbc.queryForObject(FRIENDSHIP_CHECK_QUERY, Integer.class, userId, friendId);
+        int countFriend = jdbc.queryForObject(FRIENDSHIP_CHECK_QUERY, Integer.class, friendId, userId);
         if (countUser > 0 && countFriend > 0) {
             return 1;
         }
@@ -151,5 +152,10 @@ public class UserRepository extends BaseRepository<User> implements UserStorage 
     @Override
     public List<User> findCommonFriends(Long userId, Long anotherUserId) {
         return findMany(GET_COMMON_FRIENDS_QUERY, userId, userId, anotherUserId, anotherUserId);
+    }
+
+    @Override
+    public void deleteAll() {
+        jdbc.update(DELETE_ALL_USERS_QUERY);
     }
 }

@@ -12,28 +12,18 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public final class Film {
-    private long id;
+    private Long id;
     private String name;
     private String description;
     private LocalDate releaseDate;
     private int duration;
-    private Set<Genre> genre = new HashSet<>();
-    private RatingMpa ratingMPA;
+    private Mpa MPA;
+    private Set<Genres> genres = new HashSet<>();
 
-    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration) {
-        this.id = id;
+    public Film(String name, String description, LocalDate releaseDate, Integer duration) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
-    }
-
-    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration, RatingMpa ratingMPA) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-        this.ratingMPA = ratingMPA;
     }
 }

@@ -16,7 +16,6 @@ public class UserController {
 
     private final UserService userService;
 
-
     @GetMapping
     public Collection<User> findAll() {
         return userService.findAll();
@@ -58,5 +57,15 @@ public class UserController {
     public Collection<User> findCommonFriends(@PathVariable Long id,
                                               @PathVariable Long otherId) {
         return userService.findCommonFriends(id, otherId);
+    }
+
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable Long userId) {
+        userService.deleteUser(userId);
+    }
+
+    @DeleteMapping
+    public void deleteAllUsers() {
+        userService.deleteAll();
     }
 }

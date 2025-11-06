@@ -1,12 +1,12 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dal.UserStorage;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validator.FriendValidator;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
@@ -14,13 +14,16 @@ import java.util.Collection;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class UserService {
 
     private final UserStorage userStorage;
 
     private static final String MESSAGE_OF_ID_USER = "Некорректный Id пользователя";
     private static final String MESSAGE_OF_NULL_ID_USER = "Id пользователя не указан";
+
+    public UserService(@Qualifier("userRepository") UserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
 
 
     public Collection<User> findAll() {
@@ -94,5 +97,13 @@ public class UserService {
         log.info("Поиск общих друзей пользователей с ID 1 = {} и ID 2 = {}", userId, anotherUserId);
         FriendValidator.validateFriend(userId, anotherUserId, userStorage);
         return userStorage.findCommonFriends(userId, anotherUserId);
+    }
+
+    public void deleteUser(Long id) {
+        userStorage.deleteUser(id);
+    }
+
+    public void deleteAll() {
+        userStorage.deleteAll();
     }
 }
