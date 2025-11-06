@@ -17,7 +17,7 @@ public final class Film {
     private String description;
     private LocalDate releaseDate;
     private int duration;
-    private Mpa MPA;
+    private Mpa mpa;
     private Set<Genres> genres = new HashSet<>();
 
     public Film(String name, String description, LocalDate releaseDate, Integer duration) {

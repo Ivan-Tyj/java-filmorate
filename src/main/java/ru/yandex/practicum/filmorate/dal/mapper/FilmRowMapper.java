@@ -32,7 +32,7 @@ public class FilmRowMapper implements RowMapper<Film> {
         film.setDuration(rs.getInt("duration"));
         film.setGenres(new HashSet<>());
         Mpa mpa = ratingMpaRowMapper.mapRow(rs, rowNum);
-        film.setMPA(mpa);
+        film.setMpa(mpa);
 
         return film;
     }

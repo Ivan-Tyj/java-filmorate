@@ -70,10 +70,10 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
             validateAllGenres(film.getGenres());
         }
 
-        Long ratingMpa = (film.getMPA() != null) ? film.getMPA().getId() : 1;
+        Long ratingMpa = (film.getMpa() != null) ? film.getMpa().getId() : 1;
 
-        if (film.getMPA() != null) {
-            validateMpaContain(film.getMPA().getId());
+        if (film.getMpa() != null) {
+            validateMpaContain(film.getMpa().getId());
         }
 
         long id = insert(INSERT_FILM_QUERY, film.getName(), film.getDescription(), film.getReleaseDate(),
@@ -82,7 +82,7 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
         saveGenresForFilm(film);
         Mpa mpa = ratMpaRepository.findById(ratingMpa).orElseThrow(
                 () -> new NotFoundException("Рейтинг не найден"));
-        film.setMPA(mpa);
+        film.setMpa(mpa);
         return film;
     }
 
@@ -104,7 +104,7 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
 
     @Override
     public Film update(Film film) {
-        Long ratingMpa = (film.getMPA() != null) ? film.getMPA().getId() : 1;
+        Long ratingMpa = (film.getMpa() != null) ? film.getMpa().getId() : 1;
         update(UPDATE_FILM_QUERY, film.getName(), film.getDescription(), film.getReleaseDate(),
                 film.getDuration(), ratingMpa, film.getId());
         genreRepository.deleteAllGenresFilm(film.getId());

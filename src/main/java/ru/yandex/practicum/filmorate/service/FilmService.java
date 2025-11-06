@@ -48,8 +48,8 @@ public class FilmService {
 
     public Film create(Film film) {
         FilmValidator.validateFilms(film);
-        if (film.getMPA() != null) {
-            ratingService.getRatingMpaById(film.getMPA().getId());
+        if (film.getMpa() != null) {
+            ratingService.getRatingMpaById(film.getMpa().getId());
         }
 
         if (film.getGenres() != null) {
