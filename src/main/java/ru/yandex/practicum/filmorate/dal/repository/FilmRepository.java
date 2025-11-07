@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.dal.mapper.FilmRowMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genres;
-import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.*;
@@ -55,13 +54,11 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
             """;
 
     private final GenreRepository genreRepository;
-    private final RatMpaRepository ratMpaRepository;
 
     public FilmRepository(JdbcTemplate jdbc, FilmRowMapper filmRowMapper,
-                          GenreRepository genreRepository, RatMpaRepository ratMpaRepository) {
+                          GenreRepository genreRepository) {
         super(jdbc, filmRowMapper);
         this.genreRepository = genreRepository;
-        this.ratMpaRepository = ratMpaRepository;
     }
 
     @Override
@@ -70,19 +67,18 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
             validateAllGenres(film.getGenres());
         }
 
-        Long ratingMpa = (film.getMpa() != null) ? film.getMpa().getId() : 1;
+        Long mpaId = (film.getMpa() != null) ? film.getMpa().getId() : 1;
 
         if (film.getMpa() != null) {
             validateMpaContain(film.getMpa().getId());
         }
 
         long id = insert(INSERT_FILM_QUERY, film.getName(), film.getDescription(), film.getReleaseDate(),
-                film.getDuration(), ratingMpa);
+                film.getDuration(), mpaId);
         film.setId(id);
+
         saveGenresForFilm(film);
-        Mpa mpa = ratMpaRepository.findById(ratingMpa).orElseThrow(
-                () -> new NotFoundException("Рейтинг не найден"));
-        film.setMpa(mpa);
+
         return film;
     }
 
