@@ -16,14 +16,13 @@ public class UserController {
 
     private final UserService userService;
 
-
     @GetMapping
     public Collection<User> findAll() {
         return userService.findAll();
     }
 
     @GetMapping("/{id}")
-    public User findById(@PathVariable("id") int id) {
+    public User findById(@PathVariable("id") Long id) {
         return userService.findById(id);
     }
 
@@ -51,7 +50,7 @@ public class UserController {
 
     @GetMapping("/{id}/friends")
     public Collection<User> findAllFriends(@PathVariable Long id) {
-        return userService.findAllFriends(id);
+        return userService.getFriendList(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
@@ -60,8 +59,13 @@ public class UserController {
         return userService.findCommonFriends(id, otherId);
     }
 
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable Long userId) {
+        userService.deleteUser(userId);
+    }
+
     @DeleteMapping
-    public void deleteAll() {
+    public void deleteAllUsers() {
         userService.deleteAll();
     }
 }

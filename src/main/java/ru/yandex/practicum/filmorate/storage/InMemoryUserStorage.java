@@ -3,15 +3,15 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-@Component
+
 public class InMemoryUserStorage implements UserStorage {
 
     private final Map<Long, User> users = new HashMap<>();
@@ -20,12 +20,6 @@ public class InMemoryUserStorage implements UserStorage {
     private long maxIdUsers = 0;
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
-
-
-    @Override
-    public Integer getUsersSize() {
-        return users.size();
-    }
 
     @Override
     public Collection<User> findAll() {
@@ -53,7 +47,6 @@ public class InMemoryUserStorage implements UserStorage {
         return users.get(user.getId());
     }
 
-    @Override
     public void deleteAll() {
         log.debug("Общее количество пользователей - {}", users.size());
         if (!users.isEmpty()) {
@@ -66,5 +59,30 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public boolean containUser(Long id) {
         return users.containsKey(id);
+    }
+
+    @Override
+    public List<User> findCommonFriends(Long userId, Long anotherUserId) {
+        throw new RuntimeException("Not Implements");
+    }
+
+    @Override
+    public List<User> getFriendList(Long userId) {
+        throw new RuntimeException("Not Implements");
+    }
+
+    @Override
+    public void addFriend(Long userId, Long friendId) {
+        throw new RuntimeException("Not Implements");
+    }
+
+    @Override
+    public void deleteFriend(Long userId, Long friendId) {
+        throw new RuntimeException("Not Implements");
+    }
+
+    @Override
+    public void deleteUser(Long userId) {
+        throw new RuntimeException("Not Implements");
     }
 }
