@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genres;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
@@ -20,19 +19,15 @@ public class FilmService {
 
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
-    private final RatingService ratingService;
-    private final GenreService genreService;
 
     private static final String MESSAGE_OF_ID_FILM = "Некорректный Id фильма";
     private static final String MESSAGE_OF_NOT_FOUND_LIKE = "Лайк не найден";
     private static final String MESSAGE_OF_FOUND_LIKE = "Лайк уже поставлен";
 
     public FilmService(@Qualifier("filmRepository") FilmStorage filmStorage,
-                       @Qualifier("userRepository") UserStorage userStorage, RatingService ratingService, GenreService genreService) {
+                       @Qualifier("userRepository") UserStorage userStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
-        this.ratingService = ratingService;
-        this.genreService = genreService;
     }
 
     public Collection<Film> findAll() {
@@ -48,15 +43,6 @@ public class FilmService {
 
     public Film create(Film film) {
         FilmValidator.validateFilms(film);
-        if (film.getMpa() != null) {
-            ratingService.getRatingMpaById(film.getMpa().getId());
-        }
-
-        if (film.getGenres() != null) {
-            for (Genres genre : film.getGenres()) {
-                genreService.getOneGenreById(genre.getId());
-            }
-        }
         return filmStorage.create(film);
     }
 
@@ -67,11 +53,6 @@ public class FilmService {
         }
         if (!filmStorage.containFilm(film.getId())) {
             throw new NotFoundException("Фильм с id = " + film.getId() + " не найден");
-        }
-        if (film.getGenres() != null) {
-            for (Genres genre : film.getGenres()) {
-                genreService.getOneGenreById(genre.getId());
-            }
         }
         FilmValidator.validateFilms(film);
         return filmStorage.update(film);
@@ -100,15 +81,13 @@ public class FilmService {
     }
 
     public Collection<Film> findPopularFilms(int count) {
-        int limit = 10;
-        if (count > 0) {
-            limit = count;
+        if (count <= 0) {
+            return filmStorage.getPopularFilms(10);
         }
-        return filmStorage.getPopularFilms(limit);
+        return filmStorage.getPopularFilms(count);
     }
 
     public void deleteFilmById(long id) {
         filmStorage.deleteFilmById(id);
     }
-
 }

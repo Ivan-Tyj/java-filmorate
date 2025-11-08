@@ -19,8 +19,6 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
 
     private static final String INSERT_FILM_QUERY =
             "INSERT INTO films (name, description, release_date, duration, rating_mpa_id) VALUES (?, ?, ?, ?, ?)";
-    private static final String VALIDATE_RATING_MPA_QUERY = "SELECT COUNT(*) FROM rating_mpa WHERE id = ?";
-    private static final String VALIDATE_GENRE_QUERY = "SELECT COUNT(*) FROM genres WHERE id = ?";
     private static final String UPDATE_FILM_QUERY =
             "UPDATE films " +
                     "SET name = ?, description = ?, release_date = ?, duration = ?, rating_mpa_id = ? WHERE id = ?";
@@ -63,10 +61,6 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
 
     @Override
     public Film create(Film film) {
-        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
-            validateAllGenres(film.getGenres());
-        }
-
         Long mpaId = (film.getMpa() != null) ? film.getMpa().getId() : 1;
 
         if (film.getMpa() != null) {
@@ -77,6 +71,9 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
                 film.getDuration(), mpaId);
         film.setId(id);
 
+        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
+            validateAllGenres(film.getGenres());
+        }
         saveGenresForFilm(film);
 
         return film;
@@ -93,7 +90,7 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
 
     private void validateMpaContain(Long mpaId) {
         Integer count = jdbc.queryForObject(CONTAIN_MPA_QUERY, Integer.class, mpaId);
-        if (count == 0) {
+        if (count == null || count == 0) {
             throw new NotFoundException("MPA рейтинг с ID = " + mpaId + " - не найден");
         }
     }
@@ -130,11 +127,6 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
     }
 
     @Override
-    public long getFilmsSize() {
-        return findAll().size();
-    }
-
-    @Override
     public void deleteFilmById(long id) {
         jdbc.update(DELETE_ONE_FILM_QUERY, id);
     }
@@ -147,6 +139,9 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
     @Override
     public boolean containFilm(long id) {
         Integer count = jdbc.queryForObject(COUNT_FILM_BY_ID_QUERY, Integer.class, id);
+        if (count == null || count == 0) {
+            throw new NotFoundException("Фильм не найден");
+        }
         return count > 0;
     }
 
@@ -172,23 +167,23 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
     @Override
     public boolean containLike(long filmId, long userId) {
         Integer count = jdbc.queryForObject(COUNT_CHECK_LIKE_QUERY, Integer.class, filmId, userId);
+        if (count == null) {
+            throw new NotFoundException("Лайк от пользователя с ID = " + userId + "- не найден");
+        }
         return count > 0;
     }
 
-    private void validateRatingMpa(Long ratingMpaId) {
-        Integer count = jdbc.queryForObject(VALIDATE_RATING_MPA_QUERY, Integer.class, ratingMpaId);
-        if (count == 0) {
-            throw new NotFoundException("Рейтинг MPA с ID = " + ratingMpaId + " - не найден");
-        }
-    }
-
     private void validateAllGenres(Set<Genres> genres) {
+        List<Genres> genresForFilmDb = genreRepository.findAll();
         for (Genres genre : genres) {
-            if (genre != null && genre.getId() != null) {
-                Integer count = jdbc.queryForObject(VALIDATE_GENRE_QUERY, Integer.class, genre.getId());
-                if (count == null || count == 0) {
-                    throw new NotFoundException("Жанр с ID = " + genre.getId() + " - не найден");
+            int count = 0;
+            for (Genres genreDb : genresForFilmDb) {
+                if (genre.getId().equals(genreDb.getId())) {
+                    count++;
                 }
+            }
+            if (count == 0) {
+                throw new NotFoundException("Жанр с ID = " + genre.getId() + " - не найден");
             }
         }
     }
